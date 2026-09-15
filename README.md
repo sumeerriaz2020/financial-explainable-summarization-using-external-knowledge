@@ -1,5 +1,6 @@
 # Financial Explainable Summarization with Hybrid Neural-Symbolic AI
 
+[![DOI](https://zenodo.org/badge/1371339971.svg)](https://doi.org/10.5281/zenodo.22769416)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0.1](https://img.shields.io/badge/PyTorch-2.0.1-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -282,6 +283,21 @@ Treated as future work:
   journal = {Expert Systems with Applications},
   year    = {2026},
   note    = {Manuscript under review (ESWA-D-26-12626)}
+}
+```
+
+To cite this software, use the concept DOI, which always resolves to the latest
+version ([10.5281/zenodo.22769416](https://doi.org/10.5281/zenodo.22769416)):
+
+```bibtex
+@software{riaz2026explainable_code,
+  title     = {An eXplainable Approach to Abstractive Text Summarization Using
+               External Knowledge: A Novel Framework for Financial Domain Applications},
+  author    = {Riaz, Sumeer and Bashir, M. Bilal and Naqvi, Syed Ali Hassan},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22769416},
+  url       = {https://doi.org/10.5281/zenodo.22769416}
 }
 ```
 

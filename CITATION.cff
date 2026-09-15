@@ -15,11 +15,16 @@ abstract: >-
 type: software
 license: MIT
 version: 1.0.0
-date-released: "2026-09-14"
+date-released: "2026-09-15"
 repository-code: "https://github.com/sumeerriaz2020/financial-explainable-summarization-using-external-knowledge"
-# TODO(author): after the Zenodo deposit is minted, uncomment and insert the
-# CONCEPT DOI (the version-independent one), not the per-version DOI.
-# doi: 10.5281/zenodo.XXXXXXX
+doi: 10.5281/zenodo.22769416
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22769416
+    description: Concept DOI (resolves to the latest version)
+  - type: doi
+    value: 10.5281/zenodo.22769417
+    description: Version 1.0.0
 keywords:
   - explainable artificial intelligence
   - abstractive text summarization
