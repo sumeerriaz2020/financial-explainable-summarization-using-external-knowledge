@@ -1,0 +1,124 @@
+# Evaluation Configuration
+# ========================
+# Reference: manuscript Section 3.7 and Section 4 preamble.
+#
+# Different analyses deliberately use different sample sizes. Reference-based
+# metrics require the expert-curated gold standard and so run on 100 documents;
+# analyses that need no reference summaries use larger samples.
+
+sample_sizes:
+  reference_based:
+    n: 100
+    applies_to: ["Table 3", "Table 10"]
+    note: "expert-curated evaluation subset, 2023-2024, stratified by document type"
+  error_analysis:
+    n: 500
+    applies_to: ["Table 14", "Figure 6"]
+    note: "randomly sampled summaries, manually classified by two annotators"
+  efficiency:
+    n: 1000
+    applies_to: ["Table 5"]
+
+# ---------------------------------------------------------------------------
+# Statistical testing (Section 4 preamble)
+# ---------------------------------------------------------------------------
+statistics:
+  test: "paired t-test"
+  alpha: 0.05
+  pairing: >-
+    the proposed system against each baseline on the common test set,
+    across the five seeded runs
+  seeds: [42, 123, 456, 789, 1011]
+  reporting: "mean +/- SD over 5 seeded runs"
+
+# ---------------------------------------------------------------------------
+# Standard metrics (Section 3.7.1)
+# ---------------------------------------------------------------------------
+standard_metrics:
+  - name: "ROUGE-L"
+    type: "content overlap"
+  - name: "ROUGE-1"
+    type: "content overlap"
+  - name: "ROUGE-2"
+    type: "content overlap"
+  - name: "BLEU-4"
+    type: "n-gram precision"
+  - name: "BERTScore"
+    type: "semantic similarity"
+  - name: "METEOR"
+    type: "paraphrase detection"
+
+factual_consistency:
+  # Section 3.7.1 specifies "RoBERTa-large fine-tuned on MNLI". The exact
+  # Hugging Face checkpoint id is an assumption. [id not in paper]
+  nli_model: "roberta-large-mnli"
+  components:
+    - "NLI-based consistency scoring"
+    - "named entity preservation rate"
+    - "numerical accuracy (exact match and fuzzy match within 0.5% tolerance)"
+    - "temporal consistency validation"
+  numerical_fuzzy_tolerance: 0.005
+
+# ---------------------------------------------------------------------------
+# Domain-specific metrics (Section 3.7.2)
+# ---------------------------------------------------------------------------
+# Each metric is described by what it measures and what it does not measure.
+domain_metrics:
+
+  cps:
+    name: "Causal Preservation Score"
+    equation: 7
+    formula: "|C_summary intersect C_original| / |C_original|"
+    range: [0, 1]
+    undefined_when: "C_original is empty; such documents are EXCLUDED from averaging"
+    measures: "preservation of source-attributed causal CLAIMS"
+    implementation: "training_evaluation/cps.py (claims keyed by normalized (cause, effect); exact match; each source claim counted once)"
+    construct_validity: "r = 0.52 with expert-rated Causal Preservation (Table 11)"
+    does_not_measure: "whether those causal claims are valid"
+
+  cps_weighted:
+    name: "Weighted Causal Preservation Score"
+    equation: 8
+    formula: "sum_i w_i * I(c_i in C_summary) / sum_i w_i"
+    range: [0, 1]
+    undefined_when: "sum of weights is zero; excluded"
+    weight_basis: ["frequency", "centrality", "relevance"]
+    reduces_to_cps_when: "all weights equal"
+
+  ssi:
+    name: "Stakeholder Satisfaction Index"
+    equation: 12
+    formula: "sum_s w_s * (mu_s_quality + mu_s_explainability) / 2"
+    range: [0, 1]
+    measures: "stakeholder-rated satisfaction"
+    does_not_measure: "decision quality (not validated against it)"
+    # Aggregation weights are fixed per stakeholder category and are NOT updated
+    # during testing. Only MESA's online (alpha_i, beta_j) adapt at inference,
+    # and those never modify model parameters.
+    weights_updated_during_testing: false
+    stakeholder_weights: { analyst: 0.25, compliance: 0.25, executive: 0.25, investment_manager: 0.25 }
+    construct_validity: "r = 0.58 with expert-rated Stakeholder Fit (Table 11)"
+
+  tcc:
+    name: "Temporal Consistency Coefficient"
+    equation: 9
+    formula: "(1/N) * sum_t cos_sim(E_t, E_{t-1})"
+    range: [-1, 1]
+    empirical_range: "non-negative for the explanation embeddings used"
+    undefined_when: "fewer than two periods; such documents are EXCLUDED"
+    construct_validity: "r = 0.31 with expert-rated Explainability (Table 11)"
+    measures: "stability of explanations across market regimes"
+    does_not_measure: "factual correctness - a system can be consistently inaccurate"
+    read_alongside: "Section 4.2.2 factual-consistency results"
+
+# ---------------------------------------------------------------------------
+# Regulatory alignment
+# ---------------------------------------------------------------------------
+# Documented QUALITATIVELY as a design-level compliance-support checklist
+# (Table 16). There is no quantitative compliance score: percentage compliance
+# figures are not meaningful without a validated legal instrument.
+regulatory:
+  quantitative_score: false
+  format: "design-level self-assessment checklist"
+  reported_in: "Table 16"
+  disclaimer: "Self-assessment only. Not legal certification."

@@ -1,0 +1,137 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyTorch & Models
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+saved_models/
+*.pkl
+*.pickle
+
+# Data: the public sample in data/ is part of the release
+datasets/
+data/raw/
+data/processed/
+*.tsv
+*.parquet
+
+# Logs & Outputs
+logs/
+*.log
+outputs/
+results/
+figures/
+*.png
+*.jpg
+*.pdf
+!docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.pdf
+!data/**/*.pdf
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Sphinx Documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Project Specific
+cache/
+downloads/
+fibo_data/
+pretrained/
+wandb/
+mlruns/
+
+# Exclude large files
+*.bin
+*.h5
+*.hdf5
+*.safetensors
+
+# But include important config files
+!configs/**/*.yaml
+!configs/**/*.yml
+!configs/**/*.json

@@ -1,0 +1,186 @@
+# Model Configuration
+# ===================
+# Hybrid neural-symbolic model architecture.
+# Reference: manuscript Sections 3.3 and 3.6.2; Table 1 (thresholds).
+#
+# Every value here is traceable to the manuscript; see docs/PAPER_FACTS.md.
+
+model:
+  name: "HybridFinancialSummarizer"
+  version: "1.0.0"
+
+# Values tagged [not in paper] are not reported in the manuscript. They are
+# implementation defaults or model-card values and should not be read as
+# reported settings.
+# Every untagged value is traceable to the section cited beside it.
+
+  # --- Text encoder (Section 3.6.2) ---
+  text_encoder:
+    model_name: "facebook/bart-large"   # stock backbone, 406M parameters
+    tokenizer: "facebook/bart-large"    # stock pre-trained BART tokenizer
+    max_source_length: 1024             # maximum input length, in tokens
+    # The five values below are the stock facebook/bart-large architecture, taken
+    # from its model card. [not in paper]
+    hidden_dim: 1024
+    num_encoder_layers: 12
+    num_decoder_layers: 12
+    num_attention_heads: 16
+    intermediate_size: 4096
+    activation: "gelu"                  # [not in paper]
+    freeze_embeddings: false            # [not in paper]
+    freeze_encoder: false               # [not in paper]
+
+  # --- Knowledge graph encoder (Section 3.6.2) ---
+  # Three-layer graph-attention network with 8 heads, mapping 768-dim entity
+  # embeddings through a 512-dim hidden layer to a 1024-dim output that matches
+  # the BART hidden size.
+  kg_encoder:
+    type: "graph_attention_network"
+    input_dim: 768
+    hidden_dim: 512
+    output_dim: 1024
+    num_layers: 3
+    num_heads: 8
+    add_self_loops: true                # [not in paper]
+    normalize: true                     # [not in paper]
+    residual: true                      # [not in paper]
+
+  # --- Cross-modal fusion (Equation 2, Section 3.3.1) ---
+  # Scaled dot-product attention: softmax(QK^T / sqrt(d_k))V
+  cross_attention:
+    hidden_dim: 768                     # fusion operates at 768 dims; the 1024-dim
+                                        # KG encoder output is linearly projected to 768
+    num_heads: 8
+    attention_type: "scaled_dot_product"
+    bidirectional: true                 # [not in paper]
+
+  # --- Multi-hop reasoning (Algorithm 2) ---
+  multi_hop_reasoning:
+    enabled: true
+    num_hops: 3                         # N_hops in Algorithm 2
+    path_aggregation: "attention"       # [not in paper]
+
+  # --- Decoding (Section 3.6.2) ---
+  decoder:
+    use_bart_decoder: true
+    max_length: 128                     # maximum output length, in tokens
+    num_beams: 4                        # beam width
+    length_penalty: 2.0
+    early_stopping: true
+
+# --- Regularisation (Section 3.6.2) ---
+regularization:
+  dropout: 0.15                         # selected by Bayesian search over [0.1, 0.3]
+  weight_decay: 0.01
+  gradient_clipping: 1.0
+
+# --- Per-document subgraph limits (Section 3.6.2) ---
+subgraph_limits:
+  max_nodes: 5000
+  max_edges: 15000
+
+# --- Parameter accounting (Section 3.6.2) ---
+# 406M backbone + roughly 10M KG encoder and fusion parameters.
+model_size:
+  total_parameters: 416000000
+  bart_parameters: 406000000
+  # The paper gives only the ~10M total. This per-component split is an
+  # implementation estimate. [not in paper]
+  kg_encoder_parameters: 2100000
+  cross_attention_parameters: 4700000
+  multi_hop_parameters: 3200000
+
+# --- Confidence thresholds (Table 1) ---
+# Each tuned by grid search on the validation set.
+thresholds:
+  tau_threshold: 0.65   # general confidence threshold for KG edge inclusion
+                        # [value recorded; not wired into the code]
+                        # (balances precision 0.78 / recall 0.71)
+  tau_causal: 0.70      # higher bar for causal edges; false causal claims are
+                        # more harmful than missing edges
+  tau_min: 0.35         # minimum after penalty; edges below this are removed
+                        # entirely rather than retained at low confidence
+  extension_confidence_penalty: 0.20  # applied to entities mapped to a custom
+                                      # extension class (Section 3.2.2)
+                                      # [value recorded; not wired into the code]
+
+# --- Knowledge graph (Section 3.2) ---
+knowledge_graph:
+  fibo_version: "2024-Q1"
+  modules:
+    - "FND/Agents"          # 73 classes, 152 properties
+    - "BE/LegalEntities"    # 47 classes,  84 properties
+    - "FBC/Products"        # 68 classes, 127 properties
+  total_classes: 188
+  total_properties: 363
+  extension_file: "knowledge_graph/fibo-ext-temporal-2024Q1.owl"
+  node_feature_dim: 768
+  # KG attention weight, Equation 3: softmax(score(h_text,h_kg) + lambda * R(v_i,v_j))
+  lambda_relation_weight: 0.5   # optimised via Bayesian search
+
+# --- Explainability components (Section 3.4) ---
+explainability:
+  mesa:
+    enabled: true
+    stakeholder_profiles: ["analyst", "compliance", "executive", "investment_manager"]
+    num_generators: 4       # template, retrieval, neural, hybrid
+    # Online contextual-bandit updates (Section 3.4.1). These update ONLY the
+    # stakeholder weight vectors, never the model parameters.
+    # The REINFORCE-style update with moving-average baseline is specified in the
+    # paper, not included in this release (the code uses a simplified step).
+    stakeholder_aggregation_weights:   # SSI w_s, fixed a priori (Section 3.7.2)
+      analyst: 0.25
+      compliance: 0.25
+      executive: 0.25
+      investment_manager: 0.25
+    eta_alpha: 0.01
+    eta_beta: 0.01
+    gradient_clip: 0.5
+    baseline: "moving_average"
+
+  causal_explain:
+    enabled: true
+    confidence_threshold: 0.70   # == thresholds.tau_causal
+    max_chain_length: 5          # [not in paper]
+
+  adapt_eval:
+    enabled: true
+
+  consensus:
+    enabled: true
+    num_methods: 4
+    # Algorithm 5, line 4 names these four criteria but does NOT give their
+    # weights. The values are implementation defaults. [not in paper]
+    scoring_weights:
+      accuracy: 0.30
+      linguistic: 0.25
+      stakeholder_fit: 0.25
+      compliance: 0.20
+
+  temporal_explain:
+    enabled: true
+    # Market regime detection (Section 3.4.5). Specified in the paper, not included
+    # in this release: the code uses a keyword heuristic as a stand-in.
+    regime_detection:
+      method: "hidden_markov_model"
+      states: ["bull", "bear", "sideways"]
+      window_days: 90
+      features: ["vix", "sector_rotation"]
+      holdout_accuracy: 0.813        # 81.3% on 2020-2024 held-out data
+    crisis_risk_chain_weight_multiplier: 2.0
+    # Concept drift detection (Section 3.4.5). Specified in the paper, not included
+    # in this release: the code uses a fixed TCC threshold as a stand-in.
+    drift_detection:
+      method: "page_hinkley"
+      delta: 0.15
+      recalibration_window_pairs: 500
+
+# --- Special tokens ---
+# Stock BART tokenizer defaults. [not in paper]
+special_tokens:
+  pad_token: "<pad>"
+  bos_token: "<s>"
+  eos_token: "</s>"
+  unk_token: "<unk>"
+  sep_token: "</s>"
+  mask_token: "<mask>"

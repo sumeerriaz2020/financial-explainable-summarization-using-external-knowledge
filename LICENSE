@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 sumeerriaz2020
+Copyright (c) 2026 Sumeer Riaz, M. Bilal Bashir, Syed Ali Hassan Naqvi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+THIRD-PARTY COMPONENTS
+
+This project builds on external resources distributed under their own terms.
+The MIT license above applies to the original code in this repository only.
+
+  facebook/bart-large ............ Apache License 2.0
+  FinBERT (ProsusAI / Huang et al.) ... MIT / see model card
+  Financial Industry Business Ontology (FIBO), EDM Council ... MIT License
+  PyTorch, Hugging Face Transformers ... BSD-3-Clause / Apache 2.0
+
+The sample source documents included in data/ (SEC EDGAR filings, Federal
+Reserve Board and FINRA publications, issuer earnings releases) are publicly
+available from their original publishers and are not covered by the MIT license
+above; they remain subject to their publishers' terms. Third-party news and
+earnings-call transcript content is NOT redistributed by this repository.
+See data/data_statement.md.

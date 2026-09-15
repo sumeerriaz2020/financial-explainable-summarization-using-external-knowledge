@@ -1,0 +1,65 @@
+# GPT-4 baseline prompt templates
+# ================================
+# Source: manuscript Appendix A (verbatim).
+# Used for: Table 6 (state-of-the-art comparison), Table 12 (expert preference).
+#
+# Placeholders are written as {curly_braces} and must be substituted at call time.
+
+model:
+  # Frozen snapshot used for all reported GPT-4 results.
+  # Section 5.3: reported as a historical reference point, NOT current SOTA.
+  name: "gpt-4-0613"
+  # NOT RECORDED. The manuscript does not report GPT-4 decoding parameters, and
+  # the original API scripts were not retained. These are left null rather than
+  # filled with plausible defaults. (The 128-token limit in Section 3.6.2 applies
+  # to the proposed model's beam search, not to the GPT-4 baseline.)
+  temperature: null
+  max_output_tokens: null
+
+exemplars:
+  # Section 3.7.3 / Appendix A
+  count: 5
+  source_partition: "train"        # 2015-2022
+  disjoint_from: "test"            # 2023-2024
+  sampling: "random"
+  # NOT RECORDED. Appendix A states the exemplars were "randomly drawn from the
+  # training partition" but does not say how the random draw was seeded.
+  seeds: null
+
+templates:
+
+  zero_shot:
+    description: >-
+      Zero-shot configuration. Same system message as the 5-shot template,
+      with the in-context exemplars omitted.
+    messages:
+      - role: system
+        content: |-
+          You are an expert financial analyst. Summarize the
+          following SEC filing / earnings-call transcript in a concise,
+          factual manner, preserving all key numerical figures and causal
+          relationships.
+      - role: user
+        content: |-
+          Target Document: {input_document}. Summary:
+
+  five_shot:
+    description: >-
+      5-shot configuration. Exemplars are drawn from the 2015-2022 training
+      partition and are disjoint from the 2023-2024 test period.
+    messages:
+      - role: system
+        content: |-
+          You are an expert financial analyst. Summarize the
+          following SEC filing / earnings-call transcript in a concise,
+          factual manner, preserving all key numerical figures and causal
+          relationships.
+      - role: user
+        content: |-
+          Context: {example_1, example_2, example_3, example_4, example_5}.
+          Target Document: {input_document}. Summary:
+
+notes:
+  - "No API driver is shipped. baseline_comparison.py names GPT-4 but does not call it."
+  - "Re-running against a newer model does not reproduce the reported numbers."
+  - "The exact five exemplar documents used in the reported run were not recorded."

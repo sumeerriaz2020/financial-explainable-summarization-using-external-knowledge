@@ -1,0 +1,76 @@
+# Ablation Configuration
+# ======================
+# Reference: manuscript Table 7 (Section 4.2.1) and Figure 5.
+#
+# IMPORTANT: this is a SEQUENTIAL-ADDITION ablation. Components are added
+# cumulatively, each row building on the one above. It is NOT a leave-one-out
+# ablation. Do not confuse the two designs: they yield different numbers and are
+# not alternative presentations of one experiment.
+
+ablation:
+  design: "sequential_addition"
+  base: "Base Transformer"
+  seeds: [42, 123, 456, 789, 1011]
+
+  configurations:
+
+    - id: 1
+      name: "Base Transformer"
+      components: []
+      expected: { rouge_l: 0.421, bertscore: 0.612, ssi: 0.61, cps: 0.34 }
+
+    - id: 2
+      name: "+ Knowledge Graph"
+      components: ["knowledge_graph"]
+      expected: { rouge_l: 0.438, bertscore: 0.634, ssi: 0.65, cps: 0.41 }
+
+    - id: 3
+      name: "+ MESA"
+      components: ["knowledge_graph", "mesa"]
+      expected: { rouge_l: 0.451, bertscore: 0.647, ssi: 0.72, cps: 0.43 }
+
+    - id: 4
+      name: "+ CAUSAL-EXPLAIN"
+      components: ["knowledge_graph", "mesa", "causal_explain"]
+      expected: { rouge_l: 0.459, bertscore: 0.656, ssi: 0.73, cps: 0.48 }
+
+    - id: 5
+      name: "+ ADAPT-EVAL"
+      components: ["knowledge_graph", "mesa", "causal_explain", "adapt_eval"]
+      expected: { rouge_l: 0.471, bertscore: 0.663, ssi: 0.73, cps: 0.49 }
+
+    - id: 6
+      name: "+ CONSENSUS"
+      components: ["knowledge_graph", "mesa", "causal_explain", "adapt_eval", "consensus"]
+      expected: { rouge_l: 0.479, bertscore: 0.668, ssi: 0.74, cps: 0.50 }
+
+    - id: 7
+      name: "+ All + TEMPORAL"
+      components: ["knowledge_graph", "mesa", "causal_explain", "adapt_eval", "consensus", "temporal_explain"]
+      expected: { rouge_l: 0.497, bertscore: 0.673, ssi: 0.74, cps: 0.51 }
+
+# CPS attribution across components (Section 4.2.1).
+# Note the distinction the paper draws: CAUSAL-EXPLAIN's ISOLATED contribution
+# (+11.6%) is smaller than the cumulative figure in Table 4 (+50.0%), because the
+# knowledge-graph foundation supplies prerequisite causal infrastructure.
+cps_attribution:
+  knowledge_graph:  { delta_pct: 20.6, from: 0.34, to: 0.41 }
+  mesa:             { delta_pct: 4.9,  from: 0.41, to: 0.43 }
+  causal_explain:   { delta_pct: 11.6, from: 0.43, to: 0.48 }
+  remaining:        { delta_pct: 6.3,  from: 0.48, to: 0.51 }
+
+# Knowledge-graph integration strategies (Table 8).
+kg_integration_strategies:
+  - name: "No KG integration"
+    expected: { factual_consistency: 0.724, entity_coverage: 0.612, relation_accuracy: 0.587, inference_s: 2.4 }
+  - name: "Simple concatenation"
+    detail: "prepends linked FIBO entity labels without graph traversal"
+    expected: { factual_consistency: 0.781, entity_coverage: 0.738, relation_accuracy: 0.643, inference_s: 2.6 }
+  - name: "Retrieval-augmented"
+    detail: "three-hop retrieval with linearized-triple concatenation; == BART+KG baseline"
+    expected: { factual_consistency: 0.814, entity_coverage: 0.792, relation_accuracy: 0.698, inference_s: 2.7 }
+  - name: "Attention-based KG"
+    expected: { factual_consistency: 0.837, entity_coverage: 0.814, relation_accuracy: 0.721, inference_s: 2.8 }
+  - name: "Hybrid neural-symbolic"
+    detail: "the proposed system"
+    expected: { factual_consistency: 0.876, entity_coverage: 0.842, relation_accuracy: 0.768, inference_s: 2.9 }

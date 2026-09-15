@@ -1,0 +1,379 @@
+# FIBO Ontology Configuration
+# ============================
+#
+# FIBO 2024-Q1 Module Selections and Settings
+# Reference: Section 3.2.2 (FIBO Ontology Integration)
+
+# FIBO Version
+fibo:
+  version: "2024-Q1"
+  release_date: "2024-01-15"
+  base_uri: "https://spec.edmcouncil.org/fibo/ontology"
+  download_url: "https://spec.edmcouncil.org/fibo/ontology/master/latest/"
+  
+  # Ontology format
+  format: "OWL"
+  serialization: "RDF/XML"
+  
+  # File paths
+  paths:
+    main_ontology: "data/fibo/fibo_2024_q1.owl"
+    extensions: "data/fibo/extensions/"
+    cache_dir: "data/fibo/cache/"
+
+# Core Modules (Section 3.2.2): three modules, 188 classes and 363 properties
+modules:
+  # Module 1: Foundations - Agents
+  FND_Agents:
+    enabled: true
+    description: "Foundations - Agents and People"
+    namespace: "https://spec.edmcouncil.org/fibo/ontology/FND/Agents/"
+    
+    statistics:
+      classes: 73
+      properties: 152
+      individuals: 0
+    
+    key_classes:
+      - "Organization"
+      - "Person"
+      - "AutomatedSystem"
+      - "LegalPerson"
+      - "AutonomousAgent"
+      - "Group"
+      - "ExecutiveOfficer"
+      - "Director"
+      - "Shareholder"
+      - "Stakeholder"
+    
+    key_properties:
+      - "hasAgent"
+      - "isAgentOf"
+      - "controls"
+      - "isControlledBy"
+      - "employs"
+      - "isEmployedBy"
+    
+    usage_priority: "high"
+    load_on_startup: true
+  
+  # Module 2: Business Entities - Legal Entities
+  BE_LegalEntities:
+    enabled: true
+    description: "Business Entities - Legal Entities"
+    namespace: "https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/"
+    
+    statistics:
+      classes: 47
+      properties: 84
+      individuals: 0
+    
+    key_classes:
+      - "Corporation"
+      - "Partnership"
+      - "LimitedLiabilityCompany"
+      - "PubliclyTradedCompany"
+      - "PrivateCompany"
+      - "Subsidiary"
+      - "Branch"
+      - "JointVenture"
+      - "Conglomerate"
+      - "HoldingCompany"
+    
+    key_properties:
+      - "hasLegalForm"
+      - "isIncorporatedIn"
+      - "hasSubsidiary"
+      - "isSubsidiaryOf"
+      - "hasBranch"
+      - "hasRegisteredAddress"
+    
+    usage_priority: "high"
+    load_on_startup: true
+  
+  # Module 3: Financial Business and Commerce - Products
+  FBC_Products:
+    enabled: true
+    description: "Financial Business and Commerce - Products"
+    namespace: "https://spec.edmcouncil.org/fibo/ontology/FBC/ProductsAndServices/"
+    
+    statistics:
+      classes: 68
+      properties: 127
+      individuals: 0
+    
+    key_classes:
+      - "FinancialInstrument"
+      - "Security"
+      - "Equity"
+      - "Debt"
+      - "Derivative"
+      - "Bond"
+      - "Stock"
+      - "Option"
+      - "Future"
+      - "Swap"
+    
+    key_properties:
+      - "hasIssuer"
+      - "hasCurrency"
+      - "hasMaturity"
+      - "hasYield"
+      - "hasPrice"
+      - "hasVolume"
+    
+    usage_priority: "high"
+    load_on_startup: true
+  
+  # Optional: Additional modules
+  FND_Places:
+    enabled: false
+    description: "Foundations - Places"
+    namespace: "https://spec.edmcouncil.org/fibo/ontology/FND/Places/"
+    usage_priority: "medium"
+    load_on_startup: false
+  
+  FBC_Markets:
+    enabled: false
+    description: "Financial Business and Commerce - Markets"
+    namespace: "https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/"
+    usage_priority: "medium"
+    load_on_startup: false
+
+# Custom Extensions (from fibo-ext-temporal-2024Q1.owl)
+extensions:
+  enabled: true
+  file_path: "knowledge_graph/fibo-ext-temporal-2024Q1.owl"
+  
+  # Extension 1: Temporal Annotations
+  temporal:
+    enabled: true
+    classes:
+      - "TemporalRelationship"
+      - "TemporalOrdering"
+    properties:
+      - "hasTemporalOrdering"
+      - "hasValidFrom"
+      - "hasValidUntil"
+  
+  # Extension 2: Causal Linkages
+  causal:
+    enabled: true
+    classes:
+      - "CausalRelationship"
+    properties:
+      - "hasCause"
+      - "hasEffect"
+      - "hasCausalConfidence"
+      - "hasCausalMechanism"
+  
+  # Extension 3: Stakeholder Roles
+  stakeholder:
+    enabled: true
+    classes:
+      - "StakeholderRole"
+    individuals:
+      - "FinancialAnalyst"
+      - "ComplianceOfficer"
+      - "ExecutiveOfficer"
+      - "InvestmentManager"
+    properties:
+      - "hasExpertiseLevel"
+      - "hasInformationNeed"
+  
+  # Extension 4: Regulatory Compliance
+  regulatory:
+    enabled: true
+    classes:
+      - "RegulatoryRequirement"
+    individuals:
+      - "GDPR_Article22"
+      - "SEC_RegulationSK"
+    properties:
+      - "satisfiesRequirement"
+      - "hasRegulation"
+      - "hasArticle"
+  
+  # Extension 5: Explanation Provenance
+  provenance:
+    enabled: true
+    classes:
+      - "ExplanationProvenance"
+    properties:
+      - "generatedBy"
+      - "generatedAt"
+      - "basedOnKnowledge"
+      - "hasConfidenceScore"
+  
+  # Extension 6: Market Regime
+  market_regime:
+    enabled: true
+    classes:
+      - "MarketRegime"
+    # Three HMM states (Section 3.4.5); the HMM itself is not included in this release
+    individuals:
+      - "BullMarket"
+      - "BearMarket"
+      - "SidewaysMarket"
+    properties:
+      - "occursInRegime"
+      - "hasVolatility"
+
+# Loading Configuration
+loading:
+  # Load strategy
+  strategy: "lazy"  # Options: eager, lazy, on-demand
+  
+  # Caching
+  cache_enabled: true
+  cache_size_mb: 500
+  cache_expiry_hours: 24
+  
+  # Parallel loading
+  parallel: true
+  num_workers: 4
+  
+  # Memory management
+  max_memory_mb: 2048
+  use_memory_mapping: true
+
+# Query Configuration
+querying:
+  # SPARQL endpoint
+  sparql:
+    enabled: false
+    endpoint: null
+    timeout_seconds: 30
+  
+  # Local querying
+  local:
+    enabled: true
+    index_type: "hash"  # Options: hash, tree, graph
+    cache_queries: true
+  
+  # Performance
+  max_results: 1000
+  pagination_size: 100
+
+# Reasoning Configuration
+reasoning:
+  enabled: true
+  reasoner_type: "structural"  # Options: structural, pellet, hermit
+  
+  # Inference rules
+  infer_subclasses: true
+  infer_properties: true
+  infer_individuals: false
+  
+  # Performance
+  max_inference_depth: 5
+  cache_inferences: true
+
+# Entity Linking Configuration
+entity_linking:
+  # Matching strategies
+  strategies:
+    - "exact_match"
+    - "normalized_match"
+    - "type_based"
+    - "keyword_based"
+  
+  # Confidence thresholds
+  min_confidence: 0.5
+  high_confidence: 0.8
+  
+  # Fallback behavior
+  use_fallback: true
+  fallback_to_generic: true
+
+# Statistics Tracking
+statistics:
+  # Total counts
+  total_classes: 188
+  total_properties: 363
+  total_individuals: 0
+  
+  # Module breakdown
+  FND_Agents: {classes: 73, properties: 152}
+  BE_LegalEntities: {classes: 47, properties: 84}
+  FBC_Products: {classes: 68, properties: 127}
+  
+  # Coverage (Section 3.2.2): ~78% of financial entity mentions map directly to
+  # FIBO classes; 12-15% need custom extension classes; 7-10% are generic/ambiguous
+  entity_coverage: 0.78
+  extension_confidence_penalty: 0.20
+
+# Validation
+validation:
+  # Ontology validation
+  validate_on_load: true
+  check_consistency: true
+  
+  # Schema validation
+  validate_namespaces: true
+  validate_imports: true
+  
+  # Error handling
+  strict_mode: false
+  log_warnings: true
+
+# Integration Settings
+integration:
+  # Knowledge graph construction
+  kg_construction:
+    max_nodes: 5000
+    max_edges: 15000
+    prune_disconnected: true
+  
+  # Embedding generation
+  embeddings:
+    method: "transformer"  # Options: transformer, graph, hybrid
+    dim: 768
+    cache: true
+  
+  # Update frequency
+  update_policy: "on_demand"  # Options: on_demand, scheduled, manual
+
+# Performance Optimization
+optimization:
+  # Indexing
+  index_classes: true
+  index_properties: true
+  index_individuals: false
+  
+  # Compression
+  compress_cache: true
+  compression_method: "gzip"
+  
+  # Batch processing
+  batch_size: 100
+  prefetch: true
+
+# Export Configuration
+export:
+  # Export formats
+  formats:
+    - "json"
+    - "turtle"
+    - "n-triples"
+  
+  # Export settings
+  include_metadata: true
+  include_statistics: true
+  pretty_print: true
+
+# Documentation
+documentation:
+  generate_docs: false
+  output_format: "markdown"
+  include_examples: true
+
+# Notes
+# ------
+# - Selected FIBO 2024-Q1 modules: 188 classes and 363 properties combined
+#   (the full ontology has 487 classes and 970 properties)
+# - Core modules: FND/Agents, BE/LegalEntities, FBC/Products
+# - Custom extensions add temporal, causal, and stakeholder annotations
+# - ~78% of financial entity mentions map directly to the selected modules
+# - Recommended: Enable caching for better performance
+# - Memory usage: ~500MB for full ontology with cache

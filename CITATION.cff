@@ -1,0 +1,73 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software or the accompanying artifacts, please cite both the
+  software (this file) and the associated paper (see preferred-citation).
+title: >-
+  An eXplainable Approach to Abstractive Text Summarization Using External
+  Knowledge: A Novel Framework for Financial Domain Applications
+abstract: >-
+  Reference implementation, configuration files, prompts and evaluation code for a
+  FIBO-grounded hybrid neural-symbolic framework for explainable abstractive
+  summarization of financial documents, integrating five explainability components
+  (MESA, CAUSAL-EXPLAIN, ADAPT-EVAL, INTERPRETABLE-CONSENSUS, TEMPORAL-EXPLAIN).
+  Trained model checkpoints and experimental logs from the original runs were not
+  retained; see README.md for what is and is not reproducible.
+type: software
+license: MIT
+version: 1.0.0
+date-released: "2026-09-14"
+repository-code: "https://github.com/sumeerriaz2020/financial-explainable-summarization-using-external-knowledge"
+# TODO(author): after the Zenodo deposit is minted, uncomment and insert the
+# CONCEPT DOI (the version-independent one), not the per-version DOI.
+# doi: 10.5281/zenodo.XXXXXXX
+keywords:
+  - explainable artificial intelligence
+  - abstractive text summarization
+  - knowledge graphs
+  - financial natural language processing
+  - FIBO
+  - neural-symbolic
+  - regulatory compliance
+authors:
+  - family-names: Riaz
+    given-names: Sumeer
+    email: sumeer33885@iqraisb.edu.pk
+    affiliation: IQRA University Islamabad H9 Campus, Pakistan
+    orcid: "https://orcid.org/0009-0007-3723-1282"
+  - family-names: Bashir
+    given-names: M. Bilal
+    email: bilal.bashir@iqraisb.edu.pk
+    affiliation: IQRA University Islamabad H9 Campus, Pakistan
+  - family-names: Naqvi
+    given-names: Syed Ali Hassan
+    email: ali33884@iqraisb.edu.pk
+    affiliation: IQRA University Islamabad H9 Campus, Pakistan
+contact:
+  - family-names: Riaz
+    given-names: Sumeer
+    email: sumeer33885@iqraisb.edu.pk
+preferred-citation:
+  type: article
+  title: >-
+    An eXplainable Approach to Abstractive Text Summarization Using External
+    Knowledge: A Novel Framework for Financial Domain Applications
+  authors:
+    - family-names: Riaz
+      given-names: Sumeer
+      email: sumeer33885@iqraisb.edu.pk
+      affiliation: IQRA University Islamabad H9 Campus, Pakistan
+      orcid: "https://orcid.org/0009-0007-3723-1282"
+    - family-names: Bashir
+      given-names: M. Bilal
+      affiliation: IQRA University Islamabad H9 Campus, Pakistan
+    - family-names: Naqvi
+      given-names: Syed Ali Hassan
+      affiliation: IQRA University Islamabad H9 Campus, Pakistan
+  journal: Expert Systems with Applications
+  publisher:
+    name: Elsevier
+  year: 2026
+  # Manuscript reference number: ESWA-D-26-12626 (under review at time of release).
+  # TODO(author): on acceptance, add volume, pages/article-number, and the article DOI,
+  # then remove this note and the 'notes' field below.
+  notes: Manuscript under review (ESWA-D-26-12626).

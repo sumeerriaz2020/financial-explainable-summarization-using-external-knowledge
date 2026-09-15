@@ -1,0 +1,106 @@
+# Baseline Configurations
+# =======================
+# Reference: manuscript Section 3.7.3; Table 2 (BART+KG full specification);
+# Table 6 (state-of-the-art comparison); Table 12 (expert preference).
+
+baselines:
+
+  bart_large:
+    id: 1
+    name: "BART-large"
+    citation: "Lewis et al., 2020"
+    model: "facebook/bart-large"
+    parameters: 406000000
+    learning_rate: 3.0e-5
+    batch_size: 16
+    epochs: 10
+    reported_in: ["Table 3 (Baseline column)", "Table 12"]
+
+  pegasus_large:
+    id: 2
+    name: "PEGASUS-large"
+    citation: "Zhang et al., 2020"
+    model: "google/pegasus-large"     # Hugging Face id assumed [id not in paper]
+    parameters: 568000000
+    learning_rate: 5.0e-5
+    batch_size: 8
+    epochs: 8
+    reported_in: ["Table 6 (PEGASUS + Attn row)"]
+
+  t5_base:
+    id: 3
+    name: "T5-base"
+    citation: "Raffel et al., 2020"
+    model: "t5-base"                  # Hugging Face id assumed [id not in paper]
+    parameters: 220000000
+    learning_rate: 1.0e-4
+    batch_size: 32
+    epochs: 12
+    reported_in: ["Table 6 (T5 + SHAP row)"]
+
+  financesum:
+    id: 4
+    name: "FinanceSum"
+    citation: "Tang et al., 2023"
+    reported_in: ["Table 6", "Table 12"]
+
+  gpt4:
+    id: 5
+    name: "GPT-4"
+    snapshot: "gpt-4-0613"
+    configurations: ["zero_shot", "five_shot"]
+    prompts: "prompts/gpt4_baseline.yaml"
+    # Section 5.3: frozen when the evaluation protocol was fixed. Reported as a
+    # historical reference point, NOT as a current state-of-the-art comparator.
+    is_current_sota: false
+    reported_in: ["Table 6", "Table 12"]
+    # No API driver is shipped; see prompts/README.md.
+    runnable_in_this_repo: false
+
+  bart_plus_kg:
+    id: 6
+    name: "BART + KG"
+    # This is the resource-equivalent control that isolates the contribution of
+    # the architecture from mere knowledge-graph access. It is matched to the
+    # proposed system on everything EXCEPT the fusion mechanism (Table 2).
+    model: "facebook/bart-large"
+    parameters: 406000000
+    learning_rate: 3.0e-5
+    batch_size: 16
+    epochs: 10
+    early_stopping_metric: "validation ROUGE-L"
+
+    # --- Matched to the proposed system ---
+    entity_linking: "FinBERT NER -> FIBO (Algorithm 1, lines 3-6)"   # identical
+    traversal_depth: 3                                               # identical
+    kg_snapshot: "frozen, training-only (2015-2022)"                 # identical
+    tuning_budget: "same search space and budget as baseline 1"      # comparable
+
+    # --- The single intended difference ---
+    knowledge_representation: "linearized triples as flat text"
+    fusion_mechanism: "concatenation"
+    fusion_detail: "input = [linearized KG facts] [SEP] [document]"
+    cross_modal_attention: false   # deliberately absent
+    path_encoder: false            # deliberately absent
+    fused_hidden_state: false      # deliberately absent
+
+    reported_in: ["Table 3 (BART+KG column)", "Table 8 (Retrieval-Augmented row)", "Table 12"]
+
+# ---------------------------------------------------------------------------
+# Not evaluated (Section 5.3)
+# ---------------------------------------------------------------------------
+not_evaluated:
+  - name: "Dedicated RAG pipeline"
+    reason: >-
+      BART+KG serves as the retrieval-augmented control, but it is not a
+      substitute for a purpose-built RAG system. Stated as future work.
+  - name: "KG-RAG pipeline"
+    reason: "Stated as future work (Section 5.3)."
+  - name: "FinBen benchmark (ECTSUM, EDTSUM)"
+    reason: >-
+      Different document genre and generic-quality-only metrics; identified as a
+      priority extension for future work (Section 3.7.3).
+  - name: "Current-generation commercial and open-weight LLMs"
+    reason: >-
+      The GPT-4 snapshot was frozen with the evaluation protocol. Re-benchmarking
+      against current models remains future work (Section 5.3).

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rdf:RDF [
+    <!ENTITY fibo "https://spec.edmcouncil.org/fibo/ontology">
+    <!ENTITY ext "https://spec.edmcouncil.org/fibo/ontology/extensions/2024">
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#">
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+]>
+
+<!--
+Custom FIBO Extensions for Financial Explainability
+====================================================
+
+Extends FIBO 2024-Q1 with:
+1. Temporal annotations for time-sensitive relationships
+2. Causal linkage properties for cause-effect modeling
+3. Stakeholder role classifications
+4. Regulatory compliance mappings
+5. Explanation provenance tracking
+
+These extensions maintain compatibility with FIBO core while adding
+capabilities needed for explainable AI in financial summarization.
+
+Imports the three FIBO modules of Section 3.2.2: FND/Agents, BE/LegalEntities,
+FBC/Products. Market regime individuals follow the three HMM states of
+Section 3.4.5 (bull, bear, sideways).
+
+Reference: Section 3.2
+-->
+
+<rdf:RDF xmlns:rdf="&rdf;"
+         xmlns:rdfs="&rdfs;"
+         xmlns:owl="&owl;"
+         xmlns:xsd="&xsd;"
+         xmlns:fibo="&fibo;"
+         xmlns:ext="&ext;">
+
+    <!-- Ontology Metadata -->
+    <owl:Ontology rdf:about="&ext;">
+        <rdfs:label>FIBO Extensions for Financial Explainability</rdfs:label>
+        <rdfs:comment>Custom extensions to FIBO 2024-Q1 supporting explainable AI</rdfs:comment>
+        <owl:versionInfo>1.0</owl:versionInfo>
+        <owl:imports rdf:resource="&fibo;/FND/Agents"/>
+        <owl:imports rdf:resource="&fibo;/BE/LegalEntities"/>
+        <owl:imports rdf:resource="&fibo;/FBC/Products"/>
+    </owl:Ontology>
+
+    <!-- ===================================================================== -->
+    <!-- Extension 1: Temporal Annotations                                     -->
+    <!-- ===================================================================== -->
+
+    <owl:Class rdf:about="&ext;/TemporalRelationship">
+        <rdfs:label>Temporal Relationship</rdfs:label>
+        <rdfs:comment>Relationship with temporal ordering and validity period</rdfs:comment>
+    </owl:Class>
+
+    <owl:ObjectProperty rdf:about="&ext;/hasTemporalOrdering">
+        <rdfs:label>has temporal ordering</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/TemporalRelationship"/>
+        <rdfs:range rdf:resource="&ext;/TemporalOrdering"/>
+    </owl:ObjectProperty>
+
+    <owl:Class rdf:about="&ext;/TemporalOrdering">
+        <rdfs:label>Temporal Ordering</rdfs:label>
+        <rdfs:comment>Ordering constraint between events (before, after, simultaneous)</rdfs:comment>
+    </owl:Class>
+
+    <owl:NamedIndividual rdf:about="&ext;/Before">
+        <rdf:type rdf:resource="&ext;/TemporalOrdering"/>
+        <rdfs:label>before</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/After">
+        <rdf:type rdf:resource="&ext;/TemporalOrdering"/>
+        <rdfs:label>after</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/Simultaneous">
+        <rdf:type rdf:resource="&ext;/TemporalOrdering"/>
+        <rdfs:label>simultaneous</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasValidFrom">
+        <rdfs:label>has valid from</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/TemporalRelationship"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasValidUntil">
+        <rdfs:label>has valid until</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/TemporalRelationship"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <!-- ===================================================================== -->
+    <!-- Extension 2: Causal Linkages                                          -->
+    <!-- ===================================================================== -->
+
+    <owl:Class rdf:about="&ext;/CausalRelationship">
+        <rdfs:label>Causal Relationship</rdfs:label>
+        <rdfs:comment>Cause-effect relationship with confidence score</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="&ext;/TemporalRelationship"/>
+    </owl:Class>
+
+    <owl:ObjectProperty rdf:about="&ext;/hasCause">
+        <rdfs:label>has cause</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/CausalRelationship"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="&ext;/hasEffect">
+        <rdfs:label>has effect</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/CausalRelationship"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasCausalConfidence">
+        <rdfs:label>has causal confidence</rdfs:label>
+        <rdfs:comment>Confidence score for causal relationship (0.0-1.0)</rdfs:comment>
+        <rdfs:domain rdf:resource="&ext;/CausalRelationship"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+
+    <owl:ObjectProperty rdf:about="&ext;/hasCausalMechanism">
+        <rdfs:label>has causal mechanism</rdfs:label>
+        <rdfs:comment>Description of how cause produces effect</rdfs:comment>
+        <rdfs:domain rdf:resource="&ext;/CausalRelationship"/>
+        <rdfs:range rdf:resource="&rdfs;Literal"/>
+    </owl:ObjectProperty>
+
+    <!-- ===================================================================== -->
+    <!-- Extension 3: Stakeholder Roles                                        -->
+    <!-- ===================================================================== -->
+
+    <owl:Class rdf:about="&ext;/StakeholderRole">
+        <rdfs:label>Stakeholder Role</rdfs:label>
+        <rdfs:comment>Role of stakeholder in financial ecosystem</rdfs:comment>
+        <rdfs:subClassOf rdf:resource="&fibo;/FND/Agents/Stakeholder"/>
+    </owl:Class>
+
+    <owl:NamedIndividual rdf:about="&ext;/FinancialAnalyst">
+        <rdf:type rdf:resource="&ext;/StakeholderRole"/>
+        <rdfs:label>Financial Analyst</rdfs:label>
+        <ext:hasExpertiseLevel>expert</ext:hasExpertiseLevel>
+        <ext:hasInformationNeed>quantitative_details</ext:hasInformationNeed>
+        <ext:hasInformationNeed>peer_comparison</ext:hasInformationNeed>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/ComplianceOfficer">
+        <rdf:type rdf:resource="&ext;/StakeholderRole"/>
+        <rdfs:label>Compliance Officer</rdfs:label>
+        <ext:hasExpertiseLevel>expert</ext:hasExpertiseLevel>
+        <ext:hasInformationNeed>regulatory_citations</ext:hasInformationNeed>
+        <ext:hasInformationNeed>audit_trail</ext:hasInformationNeed>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/ExecutiveOfficer">
+        <rdf:type rdf:resource="&ext;/StakeholderRole"/>
+        <rdfs:label>Executive Officer</rdfs:label>
+        <ext:hasExpertiseLevel>intermediate</ext:hasExpertiseLevel>
+        <ext:hasInformationNeed>strategic_implications</ext:hasInformationNeed>
+        <ext:hasInformationNeed>actionable_recommendations</ext:hasInformationNeed>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/InvestmentManager">
+        <rdf:type rdf:resource="&ext;/StakeholderRole"/>
+        <rdfs:label>Investment Manager</rdfs:label>
+        <ext:hasExpertiseLevel>expert</ext:hasExpertiseLevel>
+        <ext:hasInformationNeed>performance_implications</ext:hasInformationNeed>
+        <ext:hasInformationNeed>risk_factors</ext:hasInformationNeed>
+    </owl:NamedIndividual>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasExpertiseLevel">
+        <rdfs:label>has expertise level</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/StakeholderRole"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasInformationNeed">
+        <rdfs:label>has information need</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/StakeholderRole"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <!-- ===================================================================== -->
+    <!-- Extension 4: Regulatory Compliance Mappings                           -->
+    <!-- ===================================================================== -->
+
+    <owl:Class rdf:about="&ext;/RegulatoryRequirement">
+        <rdfs:label>Regulatory Requirement</rdfs:label>
+        <rdfs:comment>Regulatory compliance requirement</rdfs:comment>
+    </owl:Class>
+
+    <owl:NamedIndividual rdf:about="&ext;/GDPR_Article22">
+        <rdf:type rdf:resource="&ext;/RegulatoryRequirement"/>
+        <rdfs:label>GDPR Article 22</rdfs:label>
+        <rdfs:comment>Automated individual decision-making (Section 3.2.2 mapping)</rdfs:comment>
+        <ext:hasRegulation>GDPR</ext:hasRegulation>
+        <ext:hasArticle>22</ext:hasArticle>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/SEC_RegulationSK">
+        <rdf:type rdf:resource="&ext;/RegulatoryRequirement"/>
+        <rdfs:label>SEC Regulation S-K</rdfs:label>
+        <rdfs:comment>Disclosure requirements for SEC filings (Section 3.2.2 mapping)</rdfs:comment>
+        <ext:hasRegulation>SEC Regulation S-K</ext:hasRegulation>
+    </owl:NamedIndividual>
+
+    <owl:ObjectProperty rdf:about="&ext;/satisfiesRequirement">
+        <rdfs:label>satisfies requirement</rdfs:label>
+        <rdfs:domain rdf:resource="&owl;Thing"/>
+        <rdfs:range rdf:resource="&ext;/RegulatoryRequirement"/>
+    </owl:ObjectProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasRegulation">
+        <rdfs:label>has regulation</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/RegulatoryRequirement"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasArticle">
+        <rdfs:label>has article</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/RegulatoryRequirement"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <!-- ===================================================================== -->
+    <!-- Extension 5: Explanation Provenance                                   -->
+    <!-- ===================================================================== -->
+
+    <owl:Class rdf:about="&ext;/ExplanationProvenance">
+        <rdfs:label>Explanation Provenance</rdfs:label>
+        <rdfs:comment>Tracks source and generation of explanations</rdfs:comment>
+    </owl:Class>
+
+    <owl:DatatypeProperty rdf:about="&ext;/generatedBy">
+        <rdfs:label>generated by</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/ExplanationProvenance"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/generatedAt">
+        <rdfs:label>generated at</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/ExplanationProvenance"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+    </owl:DatatypeProperty>
+
+    <owl:ObjectProperty rdf:about="&ext;/basedOnKnowledge">
+        <rdfs:label>based on knowledge</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/ExplanationProvenance"/>
+        <rdfs:range rdf:resource="&owl;Thing"/>
+    </owl:ObjectProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasConfidenceScore">
+        <rdfs:label>has confidence score</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/ExplanationProvenance"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+
+    <!-- ===================================================================== -->
+    <!-- Extension 6: Market Regime Context                                    -->
+    <!-- ===================================================================== -->
+
+    <owl:Class rdf:about="&ext;/MarketRegime">
+        <rdfs:label>Market Regime</rdfs:label>
+        <rdfs:comment>Market condition regime (bull, bear, sideways)</rdfs:comment>
+    </owl:Class>
+
+    <owl:NamedIndividual rdf:about="&ext;/BullMarket">
+        <rdf:type rdf:resource="&ext;/MarketRegime"/>
+        <rdfs:label>Bull Market</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/BearMarket">
+        <rdf:type rdf:resource="&ext;/MarketRegime"/>
+        <rdfs:label>Bear Market</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="&ext;/SidewaysMarket">
+        <rdf:type rdf:resource="&ext;/MarketRegime"/>
+        <rdfs:label>Sideways Market</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:ObjectProperty rdf:about="&ext;/occursInRegime">
+        <rdfs:label>occurs in regime</rdfs:label>
+        <rdfs:domain rdf:resource="&owl;Thing"/>
+        <rdfs:range rdf:resource="&ext;/MarketRegime"/>
+    </owl:ObjectProperty>
+
+    <owl:DatatypeProperty rdf:about="&ext;/hasVolatility">
+        <rdfs:label>has volatility</rdfs:label>
+        <rdfs:domain rdf:resource="&ext;/MarketRegime"/>
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+
+</rdf:RDF>
